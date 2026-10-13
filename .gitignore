@@ -1,0 +1,14 @@
+# Virtual environment
+.venv/
+__pycache__/
+*.pyc
+
+# OS & Editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Large raw dataset zip (can be downloaded separately if needed, GitHub 100MB limit)
+# Note: wisdm_features_10s.csv and .arff are tracked so the dataset features are ready to use
+*.zip

@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0b1120">
+  <title>Activity Classifier — WISDM Decision Tree</title>
+  <link rel="manifest" href="manifest.json">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="model.js"></script>
+  <style>
+    :root {
+      --bg: #0b1120;
+      --card-bg: #152238;
+      --card-border: #243552;
+      --card-inner: #0d1728;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #38bdf8;
+      --primary-hover: #0ea5e9;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --purple: #a855f7;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 16px;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .app-branding h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      margin-top: 3px;
+    }
+    .badge-tag {
+      background: rgba(56, 189, 248, 0.2);
+      color: var(--primary);
+      font-size: 0.75rem;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-weight: 700;
+    }
+    .nav-tabs {
+      display: flex;
+      background: #080e1a;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 4px;
+      gap: 4px;
+    }
+    .btn-tab {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-tab.active {
+      background: var(--primary);
+      color: #0b1120;
+      font-weight: 700;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Grid Layout */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    @media (min-width: 900px) {
+      .grid-cols-2 {
+        grid-template-columns: 1fr 1fr;
+      }
+      .grid-cols-3 {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+    }
+
+    /* Cards */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 18px;
+    }
+    .card-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Hero Activity Result */
+    .hero-card {
+      background: linear-gradient(145deg, #162642, #101a2e);
+      border: 1px solid #2d456b;
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      margin-bottom: 18px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+    }
+    .activity-display {
+      font-size: 2.8rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin: 10px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+    }
+    .activity-icon {
+      font-size: 3.2rem;
+    }
+    .confidence-pill {
+      display: inline-block;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Feature Value Badges */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .feat-box {
+      background: var(--card-inner);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+    }
+    .feat-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    .feat-val {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-top: 2px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Probability Bars */
+    .prob-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+      font-size: 0.85rem;
+    }
+    .prob-name {
+      width: 90px;
+      font-weight: 600;
+    }
+    .prob-bar-bg {
+      flex: 1;
+      height: 10px;
+      background: var(--card-inner);
+      border-radius: 5px;
+      overflow: hidden;
+      border: 1px solid var(--card-border);
+    }
+    .prob-bar-fill {
+      height: 100%;
+      background: var(--primary);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+    .prob-percent {
+      width: 45px;
+      text-align: right;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Controls & Buttons */
+    .btn {
+      background: var(--primary);
+      color: #0b1120;
+      border: none;
+      padding: 10px 18px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: opacity 0.2s;
+    }
+    .btn:hover {
+      opacity: 0.9;
+    }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--card-border);
+      color: var(--text);
+    }
+    .btn-outline:hover {
+      background: var(--card-inner);
+    }
+    .btn-danger {
+      background: var(--danger);
+      color: #fff;
+    }
+    .btn-success {
+      background: var(--success);
+      color: #0b1120;
+    }
+
+    /* Range Sliders */
+    .slider-group {
+      margin-bottom: 14px;
+    }
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      margin-bottom: 4px;
+    }
+    .slider-header span:first-child {
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    .slider-header span:last-child {
+      color: var(--primary);
+      font-weight: 700;
+      font-family: monospace;
+    }
+    input[type=range] {
+      width: 100%;
+      accent-color: var(--primary);
+    }
+
+    /* Presets Pills */
+    .presets-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .preset-pill {
+      background: var(--card-inner);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .preset-pill:hover, .preset-pill.active {
+      background: var(--primary);
+      color: #0b1120;
+      border-color: var(--primary);
+    }
+
+    /* Sensor Status Banner */
+    .sensor-banner {
+      background: var(--card-inner);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .status-dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--danger);
+      margin-right: 6px;
+    }
+    .status-dot.active {
+      background: var(--success);
+      box-shadow: 0 0 8px var(--success);
+    }
+
+    /* Progress bar for 10s buffer */
+    .buffer-progress-bar {
+      width: 100%;
+      height: 6px;
+      background: var(--card-inner);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    .buffer-progress-fill {
+      height: 100%;
+      background: var(--primary);
+      width: 0%;
+      transition: width 0.1s linear;
+    }
+
+    /* Tree Code Viewer */
+    pre {
+      background: var(--card-inner);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 14px;
+      font-size: 0.8rem;
+      color: #38bdf8;
+      overflow-x: auto;
+      max-height: 500px;
+    }
+
+    /* Chart Container */
+    .chart-container {
+      position: relative;
+      height: 220px;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <header>
+    <div class="app-branding">
+      <h1>
+        <span>🏃 WISDM Activity Classifier</span>
+        <span class="badge-tag">J48 / CART Decision Tree</span>
+      </h1>
+      <div class="subtitle">
+        Real-time 10s Window Activity Recognition (Walking, Jogging, Upstairs, Downstairs, Sitting, Standing)
+      </div>
+    </div>
+    <div class="nav-tabs">
+      <button class="btn-tab active" onclick="switchTab('tab-live')">📱 Live Sensor</button>
+      <button class="btn-tab" onclick="switchTab('tab-simulator')">🎛️ Simulator & Presets</button>
+      <button class="btn-tab" onclick="switchTab('tab-tree')">🌳 Decision Tree</button>
+    </div>
+  </header>
+
+  <!-- Hero Status Box (Common to all tabs) -->
+  <div class="hero-card">
+    <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">
+      Detected Activity (10s Window)
+    </div>
+    <div class="activity-display">
+      <span class="activity-icon" id="hero-icon">⏳</span>
+      <span id="hero-activity" style="color: var(--primary);">Waiting for data...</span>
+    </div>
+    <div>
+      <span class="confidence-pill" id="hero-confidence">Confidence: --%</span>
+    </div>
+
+    <!-- 6 Extracted Features Grid -->
+    <div class="feature-grid">
+      <div class="feat-box">
+        <div class="feat-label">X Mean (x̄)</div>
+        <div class="feat-val" id="val-xmean">0.00</div>
+      </div>
+      <div class="feat-box">
+        <div class="feat-label">Y Mean (ȳ)</div>
+        <div class="feat-val" id="val-ymean">0.00</div>
+      </div>
+      <div class="feat-box">
+        <div class="feat-label">Z Mean (z̄)</div>
+        <div class="feat-val" id="val-zmean">0.00</div>
+      </div>
+      <div class="feat-box">
+        <div class="feat-label">X Std Dev (sx)</div>
+        <div class="feat-val" id="val-xdev">0.00</div>
+      </div>
+      <div class="feat-box">
+        <div class="feat-label">Y Std Dev (sy)</div>
+        <div class="feat-val" id="val-ydev">0.00</div>
+      </div>
+      <div class="feat-box">
+        <div class="feat-label">Z Std Dev (sz)</div>
+        <div class="feat-val" id="val-zdev">0.00</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 1: LIVE SENSOR -->
+  <div id="tab-live" class="tab-content active">
+    <div class="sensor-banner">
+      <div>
+        <span class="status-dot" id="sensor-dot"></span>
+        <strong id="sensor-status">Sensor Inactive</strong>
+        <span style="color: var(--text-muted); font-size: 0.85rem; margin-left: 8px;" id="sensor-stats">0 samples (0.0s buffer)</span>
+        <div class="buffer-progress-bar">
+          <div class="buffer-progress-fill" id="buffer-progress"></div>
+        </div>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button class="btn" id="btn-toggle-sensor" onclick="toggleSensor()">▶ Start Motion Sensor</button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2">
+      <!-- Live Accelerometer Waveform Chart -->
+      <div class="card">
+        <div class="card-title">
+          <span>Live Accelerometer (m/s²)</span>
+          <span style="font-size: 0.75rem; color: var(--text-muted);">~20 Hz Window</span>
+        </div>
+        <div class="chart-container">
+          <canvas id="accelChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Probability Distribution -->
+      <div class="card">
+        <div class="card-title">Class Probabilities</div>
+        <div id="live-probabilities"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 2: SIMULATOR & PRESETS -->
+  <div id="tab-simulator" class="tab-content">
+    <div class="card" style="margin-bottom: 16px;">
+      <div class="card-title">WISDM Test Set Presets (Verified Ground Truth)</div>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">
+        Click any preset from the test dataset to test the Decision Tree with representative 10-second activity features:
+      </p>
+      <div class="presets-container" id="presets-list"></div>
+    </div>
+
+    <div class="grid grid-cols-2">
+      <!-- Interactive Sliders -->
+      <div class="card">
+        <div class="card-title">Interactive Feature Sliders</div>
+        
+        <div class="slider-group">
+          <div class="slider-header">
+            <span>X Mean (m/s²)</span>
+            <span id="slider-val-xmean">0.00</span>
+          </div>
+          <input type="range" id="slider-xmean" min="-15" max="15" step="0.05" value="0.0" oninput="onSliderChange()">
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <span>Y Mean (m/s²)</span>
+            <span id="slider-val-ymean">9.80</span>
+          </div>
+          <input type="range" id="slider-ymean" min="-15" max="15" step="0.05" value="9.8" oninput="onSliderChange()">
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <span>Z Mean (m/s²)</span>
+            <span id="slider-val-zmean">0.00</span>
+          </div>
+          <input type="range" id="slider-zmean" min="-15" max="15" step="0.05" value="0.0" oninput="onSliderChange()">
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <span>X Std Dev (m/s²)</span>
+            <span id="slider-val-xdev">0.50</span>
+          </div>
+          <input type="range" id="slider-xdev" min="0" max="15" step="0.05" value="0.5" oninput="onSliderChange()">
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <span>Y Std Dev (m/s²)</span>
+            <span id="slider-val-ydev">0.50</span>
+          </div>
+          <input type="range" id="slider-ydev" min="0" max="15" step="0.05" value="0.5" oninput="onSliderChange()">
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <span>Z Std Dev (m/s²)</span>
+            <span id="slider-val-zdev">0.50</span>
+          </div>
+          <input type="range" id="slider-zdev" min="0" max="15" step="0.05" value="0.5" oninput="onSliderChange()">
+        </div>
+      </div>
+
+      <!-- Probability Breakdown -->
+      <div class="card">
+        <div class="card-title">Class Probabilities (Simulated)</div>
+        <div id="sim-probabilities"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 3: DECISION TREE INSPECTION -->
+  <div id="tab-tree" class="tab-content">
+    <div class="grid grid-cols-2">
+      <div class="card">
+        <div class="card-title">Model Specifications</div>
+        <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.8;">
+          <p><strong>Algorithm:</strong> CART / J48 DecisionTreeClassifier</p>
+          <p><strong>Max Depth:</strong> 6 (Pruned to avoid overfitting & maintain explainability)</p>
+          <p><strong>Dataset:</strong> WISDM Activity Recognition v1.1</p>
+          <p><strong>Sample Window:</strong> 10.0 seconds (200 samples @ 20 Hz)</p>
+          <p><strong>Cross-Validation Accuracy:</strong> ~85.5% (10-Fold Stratified)</p>
+          <p><strong>Holdout Test Accuracy:</strong> ~86.3%</p>
+          <p><strong>Evaluated Classes:</strong> Walking, Jogging, Upstairs, Downstairs, Sitting, Standing</p>
+        </div>
+        <div style="margin-top: 16px;">
+          <a href="confusion_matrix.png" target="_blank" class="btn btn-outline" style="text-decoration: none;">📊 Open Confusion Matrix</a>
+          <a href="decision_tree.png" target="_blank" class="btn btn-outline" style="text-decoration: none; margin-left: 8px;">🌳 Open Full Tree Diagram</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Compiled JavaScript Code</div>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">
+          Direct transpilation running natively inside this browser:
+        </p>
+        <pre><code id="js-code-preview">// Loading code...</code></pre>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // Activity Metadata & Icons
+  const ACTIVITY_META = {
+    "Walking": { icon: "🚶", color: "#38bdf8" },
+    "Jogging": { icon: "🏃", color: "#ef4444" },
+    "Upstairs": { icon: "🪜", color: "#f59e0b" },
+    "Downstairs": { icon: "📉", color: "#a855f7" },
+    "Sitting": { icon: "🪑", color: "#22c55e" },
+    "Standing": { icon: "🧍", color: "#06b6d4" },
+    "Unknown": { icon: "❓", color: "#94a3b8" }
+  };
+
+  const CLASSES = ["Walking", "Jogging", "Upstairs", "Downstairs", "Sitting", "Standing"];
+
+  // Tab switching
+  function switchTab(tabId) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.btn-tab').forEach(el => el.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    event.currentTarget.classList.add('active');
+  }
+
+  // UI Updates
+  function updateHeroDisplay(activity, confidence, features, probs) {
+    const meta = ACTIVITY_META[activity] || ACTIVITY_META["Unknown"];
+    document.getElementById('hero-icon').innerText = meta.icon;
+    const heroTitle = document.getElementById('hero-activity');
+    heroTitle.innerText = activity;
+    heroTitle.style.color = meta.color;
+    document.getElementById('hero-confidence').innerText = `Confidence: ${(confidence * 100).toFixed(1)}%`;
+
+    // Features
+    document.getElementById('val-xmean').innerText = features.xmean.toFixed(2);
+    document.getElementById('val-ymean').innerText = features.ymean.toFixed(2);
+    document.getElementById('val-zmean').innerText = features.zmean.toFixed(2);
+    document.getElementById('val-xdev').innerText = features.xdev.toFixed(2);
+    document.getElementById('val-ydev').innerText = features.ydev.toFixed(2);
+    document.getElementById('val-zdev').innerText = features.zdev.toFixed(2);
+
+    // Probability Bars
+    renderProbabilities('live-probabilities', probs, activity);
+    renderProbabilities('sim-probabilities', probs, activity);
+  }
+
+  function renderProbabilities(containerId, probs, activeActivity) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    if (!probs) probs = {};
+
+    let html = '';
+    CLASSES.forEach(c => {
+      const p = probs[c] || 0.0;
+      const pct = (p * 100).toFixed(1);
+      const isWinner = (c === activeActivity);
+      const meta = ACTIVITY_META[c];
+      html += `
+        <div class="prob-row">
+          <div class="prob-name" style="color: ${isWinner ? meta.color : 'var(--text)'};">
+            ${meta.icon} ${c}
+          </div>
+          <div class="prob-bar-bg">
+            <div class="prob-bar-fill" style="width: ${pct}%; background: ${meta.color};"></div>
+          </div>
+          <div class="prob-percent">${pct}%</div>
+        </div>
+      `;
+    });
+    container.innerHTML = html;
+  }
+
+  // Preloaded Presets from WISDM Test Set
+  let PRESETS = [];
+  async function loadPresets() {
+    try {
+      const resp = await fetch('sample_tests.json');
+      PRESETS = await resp.json();
+      const container = document.getElementById('presets-list');
+      container.innerHTML = '';
+      PRESETS.forEach((p, idx) => {
+        const meta = ACTIVITY_META[p.true_label] || ACTIVITY_META["Unknown"];
+        const btn = document.createElement('button');
+        btn.className = 'preset-pill' + (idx === 0 ? ' active' : '');
+        btn.innerHTML = `${meta.icon} ${p.true_label} #${idx+1}`;
+        btn.onclick = () => selectPreset(idx, btn);
+        container.appendChild(btn);
+      });
+      if (PRESETS.length > 0) {
+        applyPreset(PRESETS[0]);
+      }
+    } catch (e) {
+      console.warn("Could not load sample_tests.json:", e);
+    }
+  }
+
+  function selectPreset(idx, btnEl) {
+    document.querySelectorAll('.preset-pill').forEach(b => b.classList.remove('active'));
+    btnEl.classList.add('active');
+    applyPreset(PRESETS[idx]);
+  }
+
+  function applyPreset(preset) {
+    const f = preset.features;
+    document.getElementById('slider-xmean').value = f.xmean;
+    document.getElementById('slider-ymean').value = f.ymean;
+    document.getElementById('slider-zmean').value = f.zmean;
+    document.getElementById('slider-xdev').value = f.xdev;
+    document.getElementById('slider-ydev').value = f.ydev;
+    document.getElementById('slider-zdev').value = f.zdev;
+    onSliderChange();
+  }
+
+  function onSliderChange() {
+    const xmean = parseFloat(document.getElementById('slider-xmean').value);
+    const ymean = parseFloat(document.getElementById('slider-ymean').value);
+    const zmean = parseFloat(document.getElementById('slider-zmean').value);
+    const xdev = parseFloat(document.getElementById('slider-xdev').value);
+    const ydev = parseFloat(document.getElementById('slider-ydev').value);
+    const zdev = parseFloat(document.getElementById('slider-zdev').value);
+
+    document.getElementById('slider-val-xmean').innerText = xmean.toFixed(2);
+    document.getElementById('slider-val-ymean').innerText = ymean.toFixed(2);
+    document.getElementById('slider-val-zmean').innerText = zmean.toFixed(2);
+    document.getElementById('slider-val-xdev').innerText = xdev.toFixed(2);
+    document.getElementById('slider-val-ydev').innerText = ydev.toFixed(2);
+    document.getElementById('slider-val-zdev').innerText = zdev.toFixed(2);
+
+    const res = classifyActivity(xmean, ymean, zmean, xdev, ydev, zdev);
+    updateHeroDisplay(res.activity, res.confidence, { xmean, ymean, zmean, xdev, ydev, zdev }, res.probabilities);
+  }
+
+  // --- Real Smartphone Sensor Handling ---
+  let sensorActive = false;
+  let accelBuffer = []; // Buffer of {x, y, z, t}
+  const BUFFER_DURATION_MS = 10000; // 10 seconds
+  const DESIRED_SAMPLE_RATE_HZ = 20;
+
+  // Chart setup
+  let chart = null;
+  function initChart() {
+    const ctx = document.getElementById('accelChart').getContext('2d');
+    chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: Array(50).fill(''),
+        datasets: [
+          { label: 'X', data: Array(50).fill(0), borderColor: '#ef4444', borderWidth: 1.5, pointRadius: 0 },
+          { label: 'Y', data: Array(50).fill(0), borderColor: '#22c55e', borderWidth: 1.5, pointRadius: 0 },
+          { label: 'Z', data: Array(50).fill(0), borderColor: '#38bdf8', borderWidth: 1.5, pointRadius: 0 }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        scales: {
+          y: { grid: { color: '#243552' }, ticks: { color: '#94a3b8' } },
+          x: { display: false }
+        },
+        plugins: {
+          legend: { labels: { color: '#94a3b8' } }
+        }
+      }
+    });
+  }
+
+  function handleDeviceMotion(event) {
+    if (!sensorActive) return;
+    const now = performance.now();
+    // Prefer accelerationIncludingGravity to align with WISDM accelerometer measurements
+    const acc = event.accelerationIncludingGravity || event.acceleration;
+    if (!acc || acc.x === null) return;
+
+    accelBuffer.push({
+      x: acc.x,
+      y: acc.y,
+      z: acc.z,
+      t: now
+    });
+
+    // Prune buffer older than 10s
+    const cutoff = now - BUFFER_DURATION_MS;
+    while (accelBuffer.length > 0 && accelBuffer[0].t < cutoff) {
+      accelBuffer.shift();
+    }
+
+    // Update progress bar
+    const duration = accelBuffer.length > 1 ? (now - accelBuffer[0].t) : 0;
+    const pct = Math.min(100, (duration / BUFFER_DURATION_MS) * 100);
+    document.getElementById('buffer-progress').style.width = pct + '%';
+    document.getElementById('sensor-stats').innerText = 
+      `${accelBuffer.length} samples (${(duration/1000).toFixed(1)}s / 10s)`;
+
+    // Update live waveform graph periodically
+    if (chart && accelBuffer.length % 4 === 0) {
+      const recent = accelBuffer.slice(-50);
+      chart.data.labels = recent.map((_, i) => i);
+      chart.data.datasets[0].data = recent.map(p => p.x);
+      chart.data.datasets[1].data = recent.map(p => p.y);
+      chart.data.datasets[2].data = recent.map(p => p.z);
+      chart.update('none');
+    }
+
+    // Evaluate features and classify if we have sufficient samples (at least 3 seconds)
+    if (accelBuffer.length >= 30) {
+      const n = accelBuffer.length;
+      let sx = 0, sy = 0, sz = 0;
+      for (let p of accelBuffer) {
+        sx += p.x; sy += p.y; sz += p.z;
+      }
+      const mx = sx / n;
+      const my = sy / n;
+      const mz = sz / n;
+
+      let vx = 0, vy = 0, vz = 0;
+      for (let p of accelBuffer) {
+        vx += (p.x - mx) ** 2;
+        vy += (p.y - my) ** 2;
+        vz += (p.z - mz) ** 2;
+      }
+      const dx = Math.sqrt(vx / (n - 1));
+      const dy = Math.sqrt(vy / (n - 1));
+      const dz = Math.sqrt(vz / (n - 1));
+
+      const res = classifyActivity(mx, my, mz, dx, dy, dz);
+      updateHeroDisplay(res.activity, res.confidence, { xmean: mx, ymean: my, zmean: mz, xdev: dx, ydev: dy, zdev: dz }, res.probabilities);
+    }
+  }
+
+  async function toggleSensor() {
+    const btn = document.getElementById('btn-toggle-sensor');
+    const dot = document.getElementById('sensor-dot');
+    const status = document.getElementById('sensor-status');
+
+    if (sensorActive) {
+      window.removeEventListener('devicemotion', handleDeviceMotion);
+      sensorActive = false;
+      btn.innerText = "▶ Start Motion Sensor";
+      btn.className = "btn";
+      dot.classList.remove('active');
+      status.innerText = "Sensor Inactive";
+      return;
+    }
+
+    // Request permission on iOS 13+ devices
+    if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+      try {
+        const response = await DeviceMotionEvent.requestPermission();
+        if (response !== 'granted') {
+          alert('Motion sensor permission was denied.');
+          return;
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    accelBuffer = [];
+    window.addEventListener('devicemotion', handleDeviceMotion);
+    sensorActive = true;
+    btn.innerText = "⏹ Stop Sensor";
+    btn.className = "btn btn-danger";
+    dot.classList.add('active');
+    status.innerText = "Sensor Active (Sampling...)";
+  }
+
+  // Load JS code string into viewer
+  async function loadCodePreview() {
+    try {
+      const resp = await fetch('model.js');
+      const text = await resp.text();
+      document.getElementById('js-code-preview').innerText = text.slice(0, 1500) + '\n... (truncated for preview)';
+    } catch (e) {}
+  }
+
+  // Init
+  window.addEventListener('DOMContentLoaded', () => {
+    initChart();
+    loadPresets();
+    loadCodePreview();
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,218 @@
+[
+  {
+    "true_label": "Downstairs",
+    "predicted_label": "Walking",
+    "features": {
+      "xmean": 4.3369,
+      "ymean": 9.9951,
+      "zmean": 0.3893,
+      "xdev": 5.2894,
+      "ydev": 4.1354,
+      "zdev": 3.753
+    }
+  },
+  {
+    "true_label": "Downstairs",
+    "predicted_label": "Downstairs",
+    "features": {
+      "xmean": -3.5091,
+      "ymean": 8.9062,
+      "zmean": -1.5636,
+      "xdev": 2.3096,
+      "ydev": 2.7938,
+      "zdev": 1.8892
+    }
+  },
+  {
+    "true_label": "Downstairs",
+    "predicted_label": "Walking",
+    "features": {
+      "xmean": 7.0033,
+      "ymean": 8.5587,
+      "zmean": -0.4276,
+      "xdev": 5.0775,
+      "ydev": 4.4745,
+      "zdev": 5.171
+    }
+  },
+  {
+    "true_label": "Jogging",
+    "predicted_label": "Walking",
+    "features": {
+      "xmean": -5.767,
+      "ymean": 7.1138,
+      "zmean": 1.7933,
+      "xdev": 6.2883,
+      "ydev": 5.9338,
+      "zdev": 4.4227
+    }
+  },
+  {
+    "true_label": "Jogging",
+    "predicted_label": "Jogging",
+    "features": {
+      "xmean": 8.1644,
+      "ymean": 2.9052,
+      "zmean": 1.3602,
+      "xdev": 9.9758,
+      "ydev": 8.2603,
+      "zdev": 5.8403
+    }
+  },
+  {
+    "true_label": "Jogging",
+    "predicted_label": "Jogging",
+    "features": {
+      "xmean": -2.2019,
+      "ymean": 8.0444,
+      "zmean": -2.1026,
+      "xdev": 4.5038,
+      "ydev": 7.1102,
+      "zdev": 3.2584
+    }
+  },
+  {
+    "true_label": "Sitting",
+    "predicted_label": "Sitting",
+    "features": {
+      "xmean": -4.0154,
+      "ymean": 3.2851,
+      "zmean": 8.5435,
+      "xdev": 0.0835,
+      "ydev": 0.0739,
+      "zdev": 0.0498
+    }
+  },
+  {
+    "true_label": "Sitting",
+    "predicted_label": "Sitting",
+    "features": {
+      "xmean": -4.4336,
+      "ymean": 3.4697,
+      "zmean": 8.2274,
+      "xdev": 0.3187,
+      "ydev": 0.4339,
+      "zdev": 0.0505
+    }
+  },
+  {
+    "true_label": "Sitting",
+    "predicted_label": "Sitting",
+    "features": {
+      "xmean": -3.262,
+      "ymean": -0.8611,
+      "zmean": 8.3714,
+      "xdev": 0.0443,
+      "ydev": 0.0413,
+      "zdev": 0.0387
+    }
+  },
+  {
+    "true_label": "Standing",
+    "predicted_label": "Standing",
+    "features": {
+      "xmean": -1.4076,
+      "ymean": 9.786,
+      "zmean": 0.7342,
+      "xdev": 0.117,
+      "ydev": 0.0436,
+      "zdev": 0.1146
+    }
+  },
+  {
+    "true_label": "Standing",
+    "predicted_label": "Standing",
+    "features": {
+      "xmean": 1.7624,
+      "ymean": 9.8717,
+      "zmean": 1.0249,
+      "xdev": 0.1706,
+      "ydev": 0.0514,
+      "zdev": 0.1531
+    }
+  },
+  {
+    "true_label": "Standing",
+    "predicted_label": "Standing",
+    "features": {
+      "xmean": -0.9362,
+      "ymean": 9.4016,
+      "zmean": 2.7174,
+      "xdev": 0.2014,
+      "ydev": 0.0832,
+      "zdev": 0.1428
+    }
+  },
+  {
+    "true_label": "Upstairs",
+    "predicted_label": "Upstairs",
+    "features": {
+      "xmean": -5.7038,
+      "ymean": -1.9932,
+      "zmean": 0.204,
+      "xdev": 8.1323,
+      "ydev": 6.1935,
+      "zdev": 5.0045
+    }
+  },
+  {
+    "true_label": "Upstairs",
+    "predicted_label": "Jogging",
+    "features": {
+      "xmean": 7.4396,
+      "ymean": 2.9926,
+      "zmean": 0.3169,
+      "xdev": 7.2201,
+      "ydev": 5.9385,
+      "zdev": 4.2342
+    }
+  },
+  {
+    "true_label": "Upstairs",
+    "predicted_label": "Jogging",
+    "features": {
+      "xmean": -5.0851,
+      "ymean": -2.1851,
+      "zmean": 0.42,
+      "xdev": 7.3507,
+      "ydev": 5.985,
+      "zdev": 3.7239
+    }
+  },
+  {
+    "true_label": "Walking",
+    "predicted_label": "Walking",
+    "features": {
+      "xmean": -1.4763,
+      "ymean": 9.7498,
+      "zmean": -0.714,
+      "xdev": 5.2083,
+      "ydev": 5.9397,
+      "zdev": 4.9589
+    }
+  },
+  {
+    "true_label": "Walking",
+    "predicted_label": "Walking",
+    "features": {
+      "xmean": -0.003,
+      "ymean": 10.8548,
+      "zmean": -1.1694,
+      "xdev": 6.0953,
+      "ydev": 5.3328,
+      "zdev": 3.1861
+    }
+  },
+  {
+    "true_label": "Walking",
+    "predicted_label": "Walking",
+    "features": {
+      "xmean": 0.7738,
+      "ymean": 9.0879,
+      "zmean": 2.1463,
+      "xdev": 2.6224,
+      "ydev": 4.1026,
+      "zdev": 3.2343
+    }
+  }
+]

@@ -1,0 +1,130 @@
+=== WISDM ACTIVITY CLASSIFICATION (DECISION TREE) ===
+
+Model: DecisionTreeClassifier (max_depth=6, criterion='gini')
+Features: xmean, ymean, zmean, xdev, ydev, zdev
+Window duration: 10 seconds (200 samples @ 20Hz)
+Total examples: 5348
+Training examples: 4278
+Testing examples: 1070
+
+10-Fold Cross-Validation Accuracy: 0.8545 (+/- 0.0097)
+Holdout Test Accuracy: 86.26%
+
+--- Classification Report ---
+              precision    recall  f1-score   support
+
+  Downstairs     0.6047    0.2680    0.3714        97
+     Jogging     0.9648    0.9880    0.9763       333
+     Sitting     0.9667    1.0000    0.9831        58
+    Standing     1.0000    0.9565    0.9778        46
+    Upstairs     0.6400    0.5289    0.5792       121
+     Walking     0.8340    0.9687    0.8963       415
+
+    accuracy                         0.8626      1070
+   macro avg     0.8350    0.7850    0.7973      1070
+weighted avg     0.8463    0.8626    0.8460      1070
+
+--- Textual Decision Tree Rules ---
+|--- ydev <= 6.17
+|   |--- ydev <= 1.26
+|   |   |--- ymean <= 5.44
+|   |   |   |--- zmean <= 1.43
+|   |   |   |   |--- ydev <= 0.30
+|   |   |   |   |   |--- class: Sitting
+|   |   |   |   |--- ydev >  0.30
+|   |   |   |   |   |--- class: Standing
+|   |   |   |--- zmean >  1.43
+|   |   |   |   |--- class: Sitting
+|   |   |--- ymean >  5.44
+|   |   |   |--- xmean <= 2.84
+|   |   |   |   |--- zdev <= 1.49
+|   |   |   |   |   |--- ydev <= 0.67
+|   |   |   |   |   |   |--- class: Standing
+|   |   |   |   |   |--- ydev >  0.67
+|   |   |   |   |   |   |--- class: Standing
+|   |   |   |   |--- zdev >  1.49
+|   |   |   |   |   |--- class: Sitting
+|   |   |   |--- xmean >  2.84
+|   |   |   |   |--- zmean <= 0.74
+|   |   |   |   |   |--- zmean <= -3.62
+|   |   |   |   |   |   |--- class: Sitting
+|   |   |   |   |   |--- zmean >  -3.62
+|   |   |   |   |   |   |--- class: Standing
+|   |   |   |   |--- zmean >  0.74
+|   |   |   |   |   |--- class: Sitting
+|   |--- ydev >  1.26
+|   |   |--- zdev <= 2.75
+|   |   |   |--- xmean <= 0.72
+|   |   |   |   |--- xdev <= 1.46
+|   |   |   |   |   |--- xmean <= -2.10
+|   |   |   |   |   |   |--- class: Sitting
+|   |   |   |   |   |--- xmean >  -2.10
+|   |   |   |   |   |   |--- class: Upstairs
+|   |   |   |   |--- xdev >  1.46
+|   |   |   |   |   |--- zdev <= 2.16
+|   |   |   |   |   |   |--- class: Downstairs
+|   |   |   |   |   |--- zdev >  2.16
+|   |   |   |   |   |   |--- class: Upstairs
+|   |   |   |--- xmean >  0.72
+|   |   |   |   |--- ydev <= 3.83
+|   |   |   |   |   |--- ymean <= 8.87
+|   |   |   |   |   |   |--- class: Upstairs
+|   |   |   |   |   |--- ymean >  8.87
+|   |   |   |   |   |   |--- class: Walking
+|   |   |   |   |--- ydev >  3.83
+|   |   |   |   |   |--- ymean <= 9.57
+|   |   |   |   |   |   |--- class: Downstairs
+|   |   |   |   |   |--- ymean >  9.57
+|   |   |   |   |   |   |--- class: Upstairs
+|   |   |--- zdev >  2.75
+|   |   |   |--- ymean <= 3.39
+|   |   |   |   |--- xdev <= 5.37
+|   |   |   |   |   |--- zmean <= -0.22
+|   |   |   |   |   |   |--- class: Upstairs
+|   |   |   |   |   |--- zmean >  -0.22
+|   |   |   |   |   |   |--- class: Walking
+|   |   |   |   |--- xdev >  5.37
+|   |   |   |   |   |--- zmean <= -2.86
+|   |   |   |   |   |   |--- class: Upstairs
+|   |   |   |   |   |--- zmean >  -2.86
+|   |   |   |   |   |   |--- class: Jogging
+|   |   |   |--- ymean >  3.39
+|   |   |   |   |--- zmean <= 2.38
+|   |   |   |   |   |--- zmean <= -1.83
+|   |   |   |   |   |   |--- class: Downstairs
+|   |   |   |   |   |--- zmean >  -1.83
+|   |   |   |   |   |   |--- class: Walking
+|   |   |   |   |--- zmean >  2.38
+|   |   |   |   |   |--- xdev <= 2.04
+|   |   |   |   |   |   |--- class: Upstairs
+|   |   |   |   |   |--- xdev >  2.04
+|   |   |   |   |   |   |--- class: Downstairs
+|--- ydev >  6.17
+|   |--- zmean <= -4.23
+|   |   |--- class: Walking
+|   |--- zmean >  -4.23
+|   |   |--- zmean <= 2.39
+|   |   |   |--- ydev <= 6.87
+|   |   |   |   |--- zdev <= 5.26
+|   |   |   |   |   |--- ymean <= 7.22
+|   |   |   |   |   |   |--- class: Upstairs
+|   |   |   |   |   |--- ymean >  7.22
+|   |   |   |   |   |   |--- class: Jogging
+|   |   |   |   |--- zdev >  5.26
+|   |   |   |   |   |--- ymean <= 6.52
+|   |   |   |   |   |   |--- class: Jogging
+|   |   |   |   |   |--- ymean >  6.52
+|   |   |   |   |   |   |--- class: Jogging
+|   |   |   |--- ydev >  6.87
+|   |   |   |   |--- zdev <= 2.33
+|   |   |   |   |   |--- class: Downstairs
+|   |   |   |   |--- zdev >  2.33
+|   |   |   |   |   |--- ydev <= 7.70
+|   |   |   |   |   |   |--- class: Jogging
+|   |   |   |   |   |--- ydev >  7.70
+|   |   |   |   |   |   |--- class: Jogging
+|   |   |--- zmean >  2.39
+|   |   |   |--- ydev <= 8.09
+|   |   |   |   |--- class: Upstairs
+|   |   |   |--- ydev >  8.09
+|   |   |   |   |--- class: Jogging
