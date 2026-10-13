@@ -8,6 +8,9 @@ Implementation for **Assignment 2** (`02_ActivityClassification.pdf`, slide 62) 
 
 ### Requirements Addressed
 1. **Feature Extraction**: Segment the WISDM accelerometer dataset (`WISDM_ar_v1.1_raw.txt`) into **~10-second windows** ($N = 200$ samples @ $20\text{ Hz}$). For each window, compute the sample mean ($\bar{x}, \bar{y}, \bar{z}$) and sample standard deviation ($s_x, s_y, s_z$) across all three axes.
+
+> 🌐 **Live Mobile App & Interactive Demo**: [https://cantfirmed.github.io/wearable-02/](https://cantfirmed.github.io/wearable-02/)
+
 2. **Subject ID Removal**: Exclude the subject identifier column before training to prevent the classifier from memorizing individual identities.
 3. **Model Training & Evaluation**: Train a Decision Tree classifier (using `scikit-learn` CART / J48 equivalent) and perform comprehensive evaluation (10-fold Stratified Cross-Validation, holdout test split, confusion matrix, precision/recall/F1 metrics).
 4. **Mobile Implementation**: Implement the trained decision tree in a mobile application (responsive PWA with HTML5 `devicemotion`, interactive simulator, and visual tree inspector).
