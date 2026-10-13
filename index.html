@@ -391,7 +391,6 @@
     <div class="nav-tabs">
       <button class="btn-tab active" onclick="switchTab('tab-live')">📱 Live Sensor</button>
       <button class="btn-tab" onclick="switchTab('tab-simulator')">🎛️ Simulator & Presets</button>
-      <button class="btn-tab" onclick="switchTab('tab-tree')">🌳 Decision Tree</button>
     </div>
   </header>
 
@@ -541,36 +540,6 @@
       <div class="card">
         <div class="card-title">Class Probabilities (Simulated)</div>
         <div id="sim-probabilities"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- TAB 3: DECISION TREE INSPECTION -->
-  <div id="tab-tree" class="tab-content">
-    <div class="grid grid-cols-2">
-      <div class="card">
-        <div class="card-title">Model Specifications</div>
-        <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.8;">
-          <p><strong>Algorithm:</strong> CART / J48 DecisionTreeClassifier</p>
-          <p><strong>Max Depth:</strong> 6 (Pruned to avoid overfitting & maintain explainability)</p>
-          <p><strong>Dataset:</strong> WISDM Activity Recognition v1.1</p>
-          <p><strong>Sample Window:</strong> 10.0 seconds (200 samples @ 20 Hz)</p>
-          <p><strong>Cross-Validation Accuracy:</strong> ~85.5% (10-Fold Stratified)</p>
-          <p><strong>Holdout Test Accuracy:</strong> ~86.3%</p>
-          <p><strong>Evaluated Classes:</strong> Walking, Jogging, Upstairs, Downstairs, Sitting, Standing</p>
-        </div>
-        <div style="margin-top: 16px;">
-          <a href="confusion_matrix.png" target="_blank" class="btn btn-outline" style="text-decoration: none;">📊 Open Confusion Matrix</a>
-          <a href="decision_tree.png" target="_blank" class="btn btn-outline" style="text-decoration: none; margin-left: 8px;">🌳 Open Full Tree Diagram</a>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">Compiled JavaScript Code</div>
-        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">
-          Direct transpilation running natively inside this browser:
-        </p>
-        <pre><code id="js-code-preview">// Loading code...</code></pre>
       </div>
     </div>
   </div>
@@ -842,20 +811,10 @@
     status.innerText = "Sensor Active (Sampling...)";
   }
 
-  // Load JS code string into viewer
-  async function loadCodePreview() {
-    try {
-      const resp = await fetch('model.js');
-      const text = await resp.text();
-      document.getElementById('js-code-preview').innerText = text.slice(0, 1500) + '\n... (truncated for preview)';
-    } catch (e) {}
-  }
-
   // Init
   window.addEventListener('DOMContentLoaded', () => {
     initChart();
     loadPresets();
-    loadCodePreview();
   });
 </script>
 </body>
